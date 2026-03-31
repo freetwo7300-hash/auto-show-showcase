@@ -1,25 +1,56 @@
 import { useParams, Link } from "react-router-dom";
 import { AppLayout } from "@/components/layout/AppLayout";
+import { useCar } from "@/hooks/useCars";
 import { carsData } from "@/data/cars";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
-  ArrowRight,
-  Calendar,
-  Fuel,
-  Gauge,
-  Settings,
-  Palette,
-  Phone,
-  MessageCircle,
-  Car,
-  Shield,
-  CheckCircle2,
+  ArrowRight, Calendar, Fuel, Gauge, Settings, Palette, Phone, MessageCircle, Car, Shield, CheckCircle2,
 } from "lucide-react";
 
 export default function CarDetailPage() {
   const { id } = useParams();
-  const car = carsData.find((c) => c.id === id);
+  const { data: dbCar, isLoading } = useCar(id);
+
+  // Fallback to static data
+  const staticCar = carsData.find((c) => c.id === id);
+
+  const car = dbCar
+    ? {
+        id: dbCar.id,
+        brand: dbCar.brand,
+        model: dbCar.model,
+        year: dbCar.year,
+        price: Number(dbCar.price),
+        mileage: dbCar.mileage,
+        condition: dbCar.condition,
+        color: dbCar.color,
+        fuelType: (dbCar as any).fuel_type || "بنزين",
+        transmission: (dbCar as any).transmission || "أوتوماتيك",
+        engine: (dbCar as any).engine || "",
+        bodyType: dbCar.body_type,
+        description: dbCar.description || "",
+        images: dbCar.images || [],
+        features: dbCar.features || [],
+        status: dbCar.status as "متاح" | "محجوز" | "مباع",
+      }
+    : staticCar;
+
+  if (isLoading) {
+    return (
+      <AppLayout>
+        <div className="space-y-6 max-w-5xl mx-auto">
+          <Skeleton className="h-8 w-32" />
+          <Skeleton className="h-96 rounded-2xl" />
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <Skeleton className="lg:col-span-2 h-64 rounded-xl" />
+            <Skeleton className="h-64 rounded-xl" />
+          </div>
+        </div>
+      </AppLayout>
+    );
+  }
 
   if (!car) {
     return (
@@ -54,7 +85,6 @@ export default function CarDetailPage() {
   return (
     <AppLayout>
       <div className="space-y-6 max-w-5xl mx-auto">
-        {/* Back */}
         <Button variant="ghost" size="sm" asChild>
           <Link to="/cars" className="flex items-center gap-2">
             <ArrowRight className="w-4 h-4" />
@@ -62,7 +92,6 @@ export default function CarDetailPage() {
           </Link>
         </Button>
 
-        {/* Hero image area */}
         <div className="relative rounded-2xl overflow-hidden bg-gradient-to-bl from-surface-dark to-muted h-64 md:h-96 animate-fade-in">
           <div className="absolute inset-0 flex items-center justify-center">
             <span className="text-[120px] font-display font-bold text-muted-foreground/10">
@@ -81,9 +110,7 @@ export default function CarDetailPage() {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Main content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Specs grid */}
             <div className="bg-card rounded-xl border p-6 animate-fade-in" style={{ animationDelay: "100ms" }}>
               <h2 className="font-display font-bold text-xl mb-4">المواصفات</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -97,27 +124,26 @@ export default function CarDetailPage() {
               </div>
             </div>
 
-            {/* Description */}
             <div className="bg-card rounded-xl border p-6 animate-fade-in" style={{ animationDelay: "200ms" }}>
               <h2 className="font-display font-bold text-xl mb-3">الوصف</h2>
               <p className="text-muted-foreground leading-relaxed">{car.description}</p>
             </div>
 
-            {/* Features */}
-            <div className="bg-card rounded-xl border p-6 animate-fade-in" style={{ animationDelay: "300ms" }}>
-              <h2 className="font-display font-bold text-xl mb-4">المميزات</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
-                {car.features.map((f) => (
-                  <div key={f} className="flex items-center gap-2 text-sm">
-                    <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
-                    {f}
-                  </div>
-                ))}
+            {car.features.length > 0 && (
+              <div className="bg-card rounded-xl border p-6 animate-fade-in" style={{ animationDelay: "300ms" }}>
+                <h2 className="font-display font-bold text-xl mb-4">المميزات</h2>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                  {car.features.map((f) => (
+                    <div key={f} className="flex items-center gap-2 text-sm">
+                      <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
+                      {f}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
           </div>
 
-          {/* Sidebar - Price & Contact */}
           <div className="space-y-4">
             <div className="bg-card rounded-xl border p-6 sticky top-24 animate-fade-in" style={{ animationDelay: "150ms" }}>
               <p className="text-sm text-muted-foreground mb-1">السعر</p>
@@ -125,7 +151,6 @@ export default function CarDetailPage() {
                 {car.price.toLocaleString("ar-SA")}
               </p>
               <p className="text-muted-foreground text-sm">ريال سعودي</p>
-
               <div className="space-y-3 mt-6">
                 <Button className="w-full gap-2" size="lg">
                   <Phone className="w-4 h-4" />
@@ -136,11 +161,8 @@ export default function CarDetailPage() {
                   واتساب
                 </Button>
               </div>
-
               <div className="mt-6 pt-4 border-t text-center">
-                <p className="text-xs text-muted-foreground">
-                  📍 الرياض، المملكة العربية السعودية
-                </p>
+                <p className="text-xs text-muted-foreground">📍 الرياض، المملكة العربية السعودية</p>
               </div>
             </div>
           </div>
