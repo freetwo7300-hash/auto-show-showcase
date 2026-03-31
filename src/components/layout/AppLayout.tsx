@@ -118,7 +118,9 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             <ChevronLeft className="w-4 h-4" />
             <span>{navItems.find((n) => n.href === location.pathname)?.label || "الصفحة"}</span>
           </div>
-          <div />
+          <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
+            {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}
+          </Button>
         </header>
         <div className="p-4 lg:p-8">{children}</div>
       </main>
