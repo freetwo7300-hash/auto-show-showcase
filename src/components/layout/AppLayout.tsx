@@ -1,9 +1,10 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Car, PlusCircle, Menu, X, ChevronLeft, LogIn, LogOut } from "lucide-react";
+import { LayoutDashboard, Car, PlusCircle, Menu, X, ChevronLeft, LogIn, LogOut, Sun, Moon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
+import { useTheme } from "@/hooks/useTheme";
 import { toast } from "sonner";
 
 const navItems = [
