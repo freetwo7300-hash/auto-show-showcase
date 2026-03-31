@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { BRANDS, COLORS, BODY_TYPES } from "@/data/cars";
 import { useAddCar } from "@/hooks/useCars";
 import { useAuth } from "@/hooks/useAuth";
+import { ImageUpload } from "@/components/ImageUpload";
 import { toast } from "sonner";
 import { Link } from "react-router-dom";
 
@@ -26,6 +27,7 @@ export default function AddCarPage() {
   const [color, setColor] = useState("");
   const [condition, setCondition] = useState("");
   const [description, setDescription] = useState("");
+  const [images, setImages] = useState<string[]>([]);
 
   if (!user) {
     return (
@@ -58,6 +60,7 @@ export default function AddCarPage() {
         color,
         condition,
         description: description || null,
+        images: images.length > 0 ? images : null,
         added_by: user.id,
       });
       toast.success("تم إضافة السيارة بنجاح!");
@@ -135,6 +138,11 @@ export default function AddCarPage() {
           <div className="space-y-2">
             <Label>الوصف</Label>
             <Textarea placeholder="اكتب وصفاً تفصيلياً للسيارة..." rows={4} value={description} onChange={(e) => setDescription(e.target.value)} />
+          </div>
+
+          <div className="space-y-2">
+            <Label>صور السيارة</Label>
+            <ImageUpload images={images} onChange={setImages} maxImages={10} />
           </div>
 
           <div className="flex gap-3 pt-4">
