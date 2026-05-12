@@ -125,6 +125,17 @@
     background: transparent;
   }
 
+  /* ── Sidebar nav scrollbar — always dark, uses sidebar-foreground token ── */
+  aside nav {
+    scrollbar-color: hsl(var(--sidebar-foreground) / 0.18) transparent;
+  }
+  aside nav::-webkit-scrollbar-thumb {
+    background: hsl(var(--sidebar-foreground) / 0.18);
+  }
+  aside nav::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--sidebar-foreground) / 0.35);
+  }
+
   html {
     direction: rtl;
     /* Smooth scroll globally */

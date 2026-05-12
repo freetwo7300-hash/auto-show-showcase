@@ -10,11 +10,13 @@ router.get("/cars/stats", async (req, res) => {
     const [total] = await db.select({ count: count() }).from(carsTable);
     const [forSale] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "متاح"));
     const [sold] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "مباع"));
+    const [reserved] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "محجوز"));
     const brands = await db.selectDistinct({ brand: carsTable.brand }).from(carsTable);
     const [avgPriceRow] = await db.select({ avg: avg(carsTable.price) }).from(carsTable);
     return res.json({
       total: Number(total?.count ?? 0),
       for_sale: Number(forSale?.count ?? 0),
+      reserved: Number(reserved?.count ?? 0),
       sold: Number(sold?.count ?? 0),
       brands_count: brands.length,
       avg_price: Math.round(Number(avgPriceRow?.avg ?? 0)),

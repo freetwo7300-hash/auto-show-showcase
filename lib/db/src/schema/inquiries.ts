@@ -9,9 +9,16 @@ export const inquiriesTable = pgTable("inquiries", {
   email: text("email").notNull(),
   phone: text("phone").notNull(),
   message: text("message").notNull(),
+  status: text("status").default("new").notNull(),
+  admin_notes: text("admin_notes"),
   created_at: timestamp("created_at").defaultNow().notNull(),
 });
 
-export const insertInquirySchema = createInsertSchema(inquiriesTable).omit({ id: true, created_at: true });
+export const insertInquirySchema = createInsertSchema(inquiriesTable).omit({
+  id: true,
+  created_at: true,
+  status: true,
+  admin_notes: true,
+});
 export type InsertInquiry = z.infer<typeof insertInquirySchema>;
 export type Inquiry = typeof inquiriesTable.$inferSelect;

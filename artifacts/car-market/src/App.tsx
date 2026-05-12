@@ -18,6 +18,8 @@ import EditCarPage from "./pages/EditCarPage";
 import ComparePage from "./pages/ComparePage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
+import InquiriesPage from "./pages/InquiriesPage";
+import ReportsPage from "./pages/ReportsPage";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -104,7 +106,6 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
     >
       {/* ── Left / branding panel (desktop only) ── */}
       <div className="hidden lg:flex lg:w-[52%] relative flex-col items-center justify-center p-14 overflow-hidden select-none">
-        {/* radial glow */}
         <div
           className="absolute inset-0 pointer-events-none"
           style={{
@@ -112,20 +113,16 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
               "radial-gradient(ellipse 80% 70% at 30% 50%, hsl(0 85% 50% / 0.12) 0%, transparent 70%)",
           }}
         />
-        {/* bottom-left blob */}
         <div
           className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full pointer-events-none"
           style={{ background: "hsl(0 85% 50% / 0.06)" }}
         />
-        {/* top-right blob */}
         <div
           className="absolute -top-24 right-0 w-80 h-80 rounded-full pointer-events-none"
           style={{ background: "hsl(0 85% 50% / 0.04)" }}
         />
 
-        {/* Content */}
         <div className="relative z-10 w-full max-w-md text-right">
-          {/* Logo mark */}
           <div className="flex items-center gap-4 mb-12">
             <div
               className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/40 shrink-0"
@@ -134,16 +131,11 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
               <CarIcon className="w-7 h-7 text-white" />
             </div>
             <div>
-              <h1 className="font-display text-2xl font-bold text-white leading-tight">
-                المعرض
-              </h1>
-              <p className="text-sm" style={{ color: "hsl(0 0% 55%)" }}>
-                إدارة السيارات الفاخرة
-              </p>
+              <h1 className="font-display text-2xl font-bold text-white leading-tight">المعرض</h1>
+              <p className="text-sm" style={{ color: "hsl(0 0% 55%)" }}>إدارة السيارات الفاخرة</p>
             </div>
           </div>
 
-          {/* Headline */}
           <h2
             className="font-display text-4xl xl:text-5xl font-bold leading-tight mb-5"
             style={{ color: "hsl(0 0% 94%)" }}
@@ -156,28 +148,18 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
             منصة متكاملة لعرض وإدارة السيارات بواجهة عربية أنيقة
           </p>
 
-          {/* Feature list */}
           <ul className="space-y-4">
             {authFeatures.map((f, i) => (
               <li key={i} className="flex items-center gap-3">
-                <CheckCircle
-                  className="w-5 h-5 shrink-0"
-                  style={{ color: "hsl(0 85% 55%)" }}
-                />
-                <span className="text-sm" style={{ color: "hsl(0 0% 65%)" }}>
-                  {f.text}
-                </span>
+                <CheckCircle className="w-5 h-5 shrink-0" style={{ color: "hsl(0 85% 55%)" }} />
+                <span className="text-sm" style={{ color: "hsl(0 0% 65%)" }}>{f.text}</span>
               </li>
             ))}
           </ul>
 
-          {/* Divider */}
           <div
             className="mt-14 pt-8 border-t flex items-center justify-between text-xs"
-            style={{
-              borderColor: "hsl(0 0% 18%)",
-              color: "hsl(0 0% 35%)",
-            }}
+            style={{ borderColor: "hsl(0 0% 18%)", color: "hsl(0 0% 35%)" }}
           >
             <span>© 2026 المعرض</span>
             <span>جميع الحقوق محفوظة</span>
@@ -190,13 +172,10 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
         className="flex-1 flex flex-col items-center justify-center p-4 py-12 relative"
         style={{ borderRight: "1px solid hsl(0 0% 13%)" }}
       >
-        {/* Subtle top glow for the form side */}
         <div
           className="absolute top-0 inset-x-0 h-px pointer-events-none"
           style={{ background: "linear-gradient(90deg, transparent, hsl(0 85% 50% / 0.4), transparent)" }}
         />
-
-        {/* Mobile logo — only visible when branding panel is hidden */}
         <div className="lg:hidden flex items-center gap-3 mb-10">
           <div
             className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
@@ -206,10 +185,7 @@ function AuthLayout({ children }: { children: React.ReactNode }) {
           </div>
           <span className="font-display text-2xl font-bold text-white">المعرض</span>
         </div>
-
-        <div className="w-full max-w-[440px]">
-          {children}
-        </div>
+        <div className="w-full max-w-[440px]">{children}</div>
       </div>
     </div>
   );
@@ -253,17 +229,19 @@ function ClerkQueryClientCacheInvalidator() {
 function AppRoutes() {
   return (
     <Switch>
-      <Route path="/" component={Index} />
-      <Route path="/cars" component={CarsPage} />
-      <Route path="/cars/new" component={AddCarPage} />
-      <Route path="/cars/:id/edit" component={EditCarPage} />
-      <Route path="/cars/:id" component={CarDetailPage} />
-      <Route path="/compare" component={ComparePage} />
-      <Route path="/profile" component={ProfilePage} />
-      <Route path="/settings" component={SettingsPage} />
-      <Route path="/sign-in/*?" component={SignInPage} />
-      <Route path="/sign-up/*?" component={SignUpPage} />
-      <Route component={NotFound} />
+      <Route path="/"              component={Index}         />
+      <Route path="/cars"          component={CarsPage}      />
+      <Route path="/cars/new"      component={AddCarPage}    />
+      <Route path="/cars/:id/edit" component={EditCarPage}   />
+      <Route path="/cars/:id"      component={CarDetailPage} />
+      <Route path="/compare"       component={ComparePage}   />
+      <Route path="/profile"       component={ProfilePage}   />
+      <Route path="/settings"      component={SettingsPage}  />
+      <Route path="/inquiries"     component={InquiriesPage} />
+      <Route path="/reports"       component={ReportsPage}   />
+      <Route path="/sign-in/*?"    component={SignInPage}    />
+      <Route path="/sign-up/*?"    component={SignUpPage}    />
+      <Route                       component={NotFound}      />
     </Switch>
   );
 }
@@ -279,18 +257,8 @@ function ClerkProviderWithRoutes() {
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
       localization={{
-        signIn: {
-          start: {
-            title: "أهلاً بعودتك",
-            subtitle: "سجّل دخولك للمتابعة",
-          },
-        },
-        signUp: {
-          start: {
-            title: "إنشاء حساب جديد",
-            subtitle: "سجّل في معرض السيارات",
-          },
-        },
+        signIn:  { start: { title: "أهلاً بعودتك",      subtitle: "سجّل دخولك للمتابعة"     } },
+        signUp:  { start: { title: "إنشاء حساب جديد",   subtitle: "سجّل في معرض السيارات"   } },
       }}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}
