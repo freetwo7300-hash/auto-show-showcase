@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, carsTable } from "@workspace/db";
 import { eq, desc, and, gte, lte, SQL, count, avg } from "drizzle-orm";
-import { requireAuth, getClerkUserId, type AuthedRequest } from "./auth";
+import { requireAuth, type AuthedRequest } from "./auth";
 
 const router = Router();
 

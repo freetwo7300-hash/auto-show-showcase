@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { db, favoritesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
-import { requireAuth, getClerkUserId, type AuthedRequest } from "./auth";
+import { requireAuth, type AuthedRequest } from "./auth";
 
 const router = Router();
 
