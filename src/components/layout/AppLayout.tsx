@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { cn } from "@/lib/utils";
-import { LayoutDashboard, Car, PlusCircle, Menu, X, ChevronLeft, LogIn, LogOut, Sun, Moon } from "lucide-react";
+import { LayoutDashboard, Car, PlusCircle, Menu, X, ChevronLeft, LogIn, LogOut, Sun, Moon, Heart, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/hooks/useAuth";
 import { useTheme } from "@/hooks/useTheme";
@@ -11,6 +11,9 @@ const navItems = [
   { href: "/", label: "لوحة التحكم", icon: LayoutDashboard },
   { href: "/cars", label: "السيارات", icon: Car },
   { href: "/cars/new", label: "إضافة سيارة", icon: PlusCircle },
+  { href: "/favorites", label: "المفضلة", icon: Heart },
+  { href: "/profile", label: "الملف الشخصي", icon: User },
+  { href: "/settings", label: "الإعدادات", icon: Settings },
 ];
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
