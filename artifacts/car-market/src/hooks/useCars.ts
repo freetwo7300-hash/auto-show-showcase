@@ -22,13 +22,8 @@ export interface DbCar {
 export type CarInput = Omit<DbCar, "id" | "created_at" | "updated_at">;
 export type CarUpdate = Partial<CarInput>;
 
-function getToken() {
-  return localStorage.getItem("car_market_token");
-}
-
-function authHeaders() {
-  const token = getToken();
-  return token ? { Authorization: `Bearer ${token}`, "Content-Type": "application/json" } : { "Content-Type": "application/json" };
+async function authHeaders(): Promise<Record<string, string>> {
+  return { "Content-Type": "application/json" };
 }
 
 export function useCars(filters?: Record<string, string | number | undefined>) {
@@ -76,14 +71,16 @@ export function useAddCar() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (car: CarInput) => {
+      const headers = await authHeaders();
       const res = await fetch("/api/cars", {
         method: "POST",
-        headers: authHeaders(),
+        headers,
         body: JSON.stringify(car),
+        credentials: "include",
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as any).error ?? "Failed to create car");
+        const err = await res.json().catch(() => ({ error: "Failed to create car" }));
+        throw new Error((err as { error?: string }).error ?? "Failed to create car");
       }
       return res.json() as Promise<DbCar>;
     },
@@ -95,14 +92,16 @@ export function useUpdateCar() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async ({ id, ...patch }: { id: string } & CarUpdate) => {
+      const headers = await authHeaders();
       const res = await fetch(`/api/cars/${id}`, {
         method: "PATCH",
-        headers: authHeaders(),
+        headers,
         body: JSON.stringify(patch),
+        credentials: "include",
       });
       if (!res.ok) {
-        const err = await res.json().catch(() => ({}));
-        throw new Error((err as any).error ?? "Failed to update car");
+        const err = await res.json().catch(() => ({ error: "Failed to update car" }));
+        throw new Error((err as { error?: string }).error ?? "Failed to update car");
       }
       return res.json() as Promise<DbCar>;
     },
@@ -117,9 +116,11 @@ export function useDeleteCar() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: async (id: string) => {
+      const headers = await authHeaders();
       const res = await fetch(`/api/cars/${id}`, {
         method: "DELETE",
-        headers: authHeaders(),
+        headers,
+        credentials: "include",
       });
       if (!res.ok) throw new Error("Failed to delete car");
     },
@@ -133,7 +134,7 @@ export function useFavorites(userId: string | undefined) {
     queryKey: ["favorites", userId],
     queryFn: async () => {
       if (!userId) return [];
-      const res = await fetch("/api/favorites", { headers: authHeaders() });
+      const res = await fetch("/api/favorites", { credentials: "include" });
       if (!res.ok) return [];
       return res.json() as Promise<string[]>;
     },
@@ -147,9 +148,9 @@ export function useToggleFavorite(userId: string | undefined) {
     mutationFn: async ({ carId, isFav }: { carId: string; isFav: boolean }) => {
       if (!userId) throw new Error("not signed in");
       if (isFav) {
-        await fetch(`/api/favorites/${carId}`, { method: "DELETE", headers: authHeaders() });
+        await fetch(`/api/favorites/${carId}`, { method: "DELETE", credentials: "include" });
       } else {
-        await fetch(`/api/favorites/${carId}`, { method: "POST", headers: authHeaders() });
+        await fetch(`/api/favorites/${carId}`, { method: "POST", credentials: "include" });
       }
     },
     onSuccess: () => qc.invalidateQueries({ queryKey: ["favorites", userId] }),

@@ -1,4 +1,4 @@
-import { Link } from "react-router-dom";
+import { Link } from "wouter";
 import { Car } from "@/data/cars";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
@@ -35,7 +35,7 @@ export function CarCard({ car, delay = 0 }: CarCardProps) {
 
   return (
     <Link
-      to={`/cars/${car.id}`}
+      href={`/cars/${car.id}`}
       className="group block opacity-0 animate-fade-in"
       style={{ animationDelay: `${delay}ms` }}
     >

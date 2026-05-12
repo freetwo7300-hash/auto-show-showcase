@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams, Link } from "react-router-dom";
+import { useLocation, useParams } from "wouter";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -17,7 +17,7 @@ export default function EditCarPage() {
   const { user } = useAuth();
   const { data: car, isLoading } = useCar(id);
   const update = useUpdateCar();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const [form, setForm] = useState({
     brand: "", model: "", year: "", price: "", mileage: "0",
@@ -37,7 +37,7 @@ export default function EditCarPage() {
     }
   }, [car]);
 
-  if (!user) return <AppLayout><div className="text-center py-20"><p>سجّل الدخول أولاً</p><Button asChild className="mt-4"><Link to="/auth">تسجيل الدخول</Link></Button></div></AppLayout>;
+  if (!user) return <AppLayout><div className="text-center py-20"><p>سجّل الدخول أولاً</p><Button className="mt-4" onClick={() => navigate("/sign-in")}>تسجيل الدخول</Button></div></AppLayout>;
   if (isLoading) return <AppLayout><div className="p-8">جاري التحميل...</div></AppLayout>;
   if (!car) return <AppLayout><div className="p-8">السيارة غير موجودة</div></AppLayout>;
   if (car.added_by !== user.id) return <AppLayout><div className="p-8">لا تملك صلاحية التعديل</div></AppLayout>;
@@ -55,7 +55,7 @@ export default function EditCarPage() {
       });
       toast.success("تم تحديث السيارة");
       navigate(`/cars/${car.id}`);
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "حدث خطأ"); }
   };
 
   const set = (k: keyof typeof form) => (v: string) => setForm((s) => ({ ...s, [k]: v }));
@@ -115,7 +115,7 @@ export default function EditCarPage() {
             <ImageUpload images={images} onChange={setImages} maxImages={10} /></div>
           <div className="flex gap-3 pt-4">
             <Button type="submit" size="lg" disabled={update.isPending}>{update.isPending ? "جاري الحفظ..." : "حفظ التغييرات"}</Button>
-            <Button type="button" variant="outline" size="lg" onClick={() => navigate(-1)}>إلغاء</Button>
+            <Button type="button" variant="outline" size="lg" onClick={() => navigate(`/cars/${car.id}`)}>إلغاء</Button>
           </div>
         </form>
       </div>

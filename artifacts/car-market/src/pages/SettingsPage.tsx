@@ -5,13 +5,13 @@ import { Switch } from "@/components/ui/switch";
 import { Label } from "@/components/ui/label";
 import { Settings as SettingsIcon, Moon, Sun, LogOut } from "lucide-react";
 import { useAuth } from "@/hooks/useAuth";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { toast } from "sonner";
 
 export default function SettingsPage() {
   const { theme, toggleTheme } = useTheme();
   const { user, signOut } = useAuth();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const onSignOut = async () => {
     await signOut();

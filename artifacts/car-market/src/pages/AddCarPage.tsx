@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useLocation } from "wouter";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -11,12 +11,11 @@ import { useAddCar } from "@/hooks/useCars";
 import { useAuth } from "@/hooks/useAuth";
 import { ImageUpload } from "@/components/ImageUpload";
 import { toast } from "sonner";
-import { Link } from "react-router-dom";
 
 export default function AddCarPage() {
   const { user } = useAuth();
   const addCar = useAddCar();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
 
   const [brand, setBrand] = useState("");
   const [model, setModel] = useState("");
@@ -34,9 +33,7 @@ export default function AddCarPage() {
       <AppLayout>
         <div className="text-center py-20">
           <p className="text-xl text-muted-foreground mb-4">يجب تسجيل الدخول لإضافة سيارة</p>
-          <Button asChild>
-            <Link to="/auth">تسجيل الدخول</Link>
-          </Button>
+          <Button onClick={() => navigate("/sign-in")}>تسجيل الدخول</Button>
         </div>
       </AppLayout>
     );
@@ -59,14 +56,16 @@ export default function AddCarPage() {
         body_type: bodyType,
         color,
         condition,
+        status: "متاح",
         description: description || null,
+        features: null,
         images: images.length > 0 ? images : null,
         added_by: user.id,
       });
       toast.success("تم إضافة السيارة بنجاح!");
       navigate("/cars");
-    } catch (err: any) {
-      toast.error("حدث خطأ", { description: err.message });
+    } catch (err) {
+      toast.error("حدث خطأ", { description: err instanceof Error ? err.message : "خطأ غير معروف" });
     }
   };
 

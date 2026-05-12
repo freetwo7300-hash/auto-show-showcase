@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link, useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation } from "wouter";
 import { cn } from "@/lib/utils";
 import { LayoutDashboard, Car, PlusCircle, Menu, X, ChevronLeft, LogIn, LogOut, Sun, Moon, Heart, User, Settings } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -18,8 +18,7 @@ const navItems = [
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const location = useLocation();
-  const navigate = useNavigate();
+  const [location, navigate] = useLocation();
   const { user, signOut, loading } = useAuth();
   const { theme, toggleTheme } = useTheme();
 
@@ -43,7 +42,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
       >
         <div className="p-6 border-b border-sidebar-border">
           <div className="flex items-center justify-between">
-            <Link to="/" className="flex items-center gap-3">
+            <Link href="/" className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-lg bg-sidebar-primary flex items-center justify-center">
                 <Car className="w-6 h-6 text-sidebar-primary-foreground" />
               </div>
@@ -60,11 +59,11 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         <nav className="flex-1 p-4 space-y-1">
           {navItems.map((item) => {
-            const isActive = location.pathname === item.href;
+            const isActive = location === item.href;
             return (
               <Link
                 key={item.href}
-                to={item.href}
+                href={item.href}
                 onClick={() => setSidebarOpen(false)}
                 className={cn(
                   "flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-all",
@@ -102,7 +101,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
             </div>
           ) : (
             <Link
-              to="/auth"
+              href="/sign-in"
               className="flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-sidebar-foreground/70 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground transition-all"
             >
               <LogIn className="w-5 h-5" />
@@ -119,7 +118,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
           </button>
           <div className="flex items-center gap-2 text-sm text-muted-foreground">
             <ChevronLeft className="w-4 h-4" />
-            <span>{navItems.find((n) => n.href === location.pathname)?.label || "الصفحة"}</span>
+            <span>{navItems.find((n) => n.href === location)?.label || "الصفحة"}</span>
           </div>
           <Button variant="ghost" size="icon" onClick={toggleTheme} className="h-9 w-9">
             {theme === "light" ? <Moon className="w-4 h-4" /> : <Sun className="w-4 h-4" />}

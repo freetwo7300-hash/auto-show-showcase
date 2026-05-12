@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { useParams, Link, useNavigate } from "react-router-dom";
+import { useParams, useLocation, Link } from "wouter";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { useCar, useDeleteCar } from "@/hooks/useCars";
 import { useAuth } from "@/hooks/useAuth";
@@ -21,7 +21,7 @@ import { toast } from "sonner";
 
 export default function CarDetailPage() {
   const { id } = useParams();
-  const navigate = useNavigate();
+  const [, navigate] = useLocation();
   const { user } = useAuth();
   const { data: dbCar, isLoading } = useCar(id);
   const del = useDeleteCar();
@@ -32,9 +32,9 @@ export default function CarDetailPage() {
     ? {
         id: dbCar.id, brand: dbCar.brand, model: dbCar.model, year: dbCar.year,
         price: Number(dbCar.price), mileage: dbCar.mileage, condition: dbCar.condition,
-        color: dbCar.color, fuelType: (dbCar as any).fuel_type || "بنزين",
-        transmission: (dbCar as any).transmission || "أوتوماتيك",
-        engine: (dbCar as any).engine || "—", bodyType: dbCar.body_type,
+        color: dbCar.color, fuelType: "بنزين",
+        transmission: "أوتوماتيك",
+        engine: "—", bodyType: dbCar.body_type,
         description: dbCar.description || "", images: dbCar.images || [],
         features: dbCar.features || [], status: dbCar.status as "متاح" | "محجوز" | "مباع",
         added_by: dbCar.added_by,
@@ -57,13 +57,13 @@ export default function CarDetailPage() {
       <AppLayout>
         <div className="text-center py-20">
           <p className="text-xl text-muted-foreground">السيارة غير موجودة</p>
-          <Button variant="ghost" asChild className="mt-4"><Link to="/cars">العودة للسيارات</Link></Button>
+          <Button variant="ghost" asChild className="mt-4"><Link href="/cars">العودة للسيارات</Link></Button>
         </div>
       </AppLayout>
     );
   }
 
-  const isOwner = user && (car as any).added_by === user.id;
+  const isOwner = user && "added_by" in car && car.added_by === user.id;
   const images = car.images && car.images.length > 0 ? car.images : [placeholder];
 
   const statusColor = {
@@ -88,7 +88,7 @@ export default function CarDetailPage() {
       await del.mutateAsync(car.id);
       toast.success("تم حذف السيارة");
       navigate("/cars");
-    } catch (e: any) { toast.error(e.message); }
+    } catch (e) { toast.error(e instanceof Error ? e.message : "حدث خطأ"); }
   };
 
   return (
@@ -96,14 +96,14 @@ export default function CarDetailPage() {
       <div className="space-y-6 max-w-5xl mx-auto">
         <div className="flex items-center justify-between">
           <Button variant="ghost" size="sm" asChild>
-            <Link to="/cars" className="flex items-center gap-2">
+            <Link href="/cars" className="flex items-center gap-2">
               <ArrowRight className="w-4 h-4" /> العودة للسيارات
             </Link>
           </Button>
           {isOwner && (
             <div className="flex gap-2">
               <Button size="sm" variant="outline" asChild>
-                <Link to={`/cars/${car.id}/edit`}><Pencil className="w-4 h-4 ml-1" /> تعديل</Link>
+                <Link href={`/cars/${car.id}/edit`}><Pencil className="w-4 h-4 ml-1" /> تعديل</Link>
               </Button>
               <AlertDialog>
                 <AlertDialogTrigger asChild>

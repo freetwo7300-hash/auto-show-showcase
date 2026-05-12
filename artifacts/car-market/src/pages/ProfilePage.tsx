@@ -4,22 +4,21 @@ import { useAuth } from "@/hooks/useAuth";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { Link } from "react-router-dom";
+import { useLocation } from "wouter";
 import { toast } from "sonner";
 import { User } from "lucide-react";
 
 export default function ProfilePage() {
-  const { user, token } = useAuth();
+  const { user } = useAuth();
+  const [, navigate] = useLocation();
   const [displayName, setDisplayName] = useState("");
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    if (!user || !token) { setLoading(false); return; }
-    fetch("/api/profile", {
-      headers: { Authorization: `Bearer ${token}` },
-    })
+    if (!user) { setLoading(false); return; }
+    fetch("/api/profile", { credentials: "include" })
       .then(r => r.ok ? r.json() : null)
       .then(data => {
         if (data) {
@@ -29,27 +28,27 @@ export default function ProfilePage() {
         setLoading(false);
       })
       .catch(() => setLoading(false));
-  }, [user, token]);
+  }, [user]);
 
   if (!user) {
     return <AppLayout><div className="text-center py-20">
       <p className="text-xl mb-4">سجّل الدخول لعرض ملفك</p>
-      <Button asChild><Link to="/auth">تسجيل الدخول</Link></Button>
+      <Button onClick={() => navigate("/sign-in")}>تسجيل الدخول</Button>
     </div></AppLayout>;
   }
 
   const save = async () => {
-    if (!token) return;
     setSaving(true);
     const res = await fetch("/api/profile", {
       method: "PATCH",
-      headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" },
+      credentials: "include",
       body: JSON.stringify({ display_name: displayName, phone }),
     });
     setSaving(false);
     if (!res.ok) {
-      const err = await res.json().catch(() => ({}));
-      toast.error((err as any).error ?? "حدث خطأ");
+      const err = await res.json().catch(() => ({ error: "حدث خطأ" }));
+      toast.error((err as { error?: string }).error ?? "حدث خطأ");
     } else {
       toast.success("تم حفظ البيانات");
     }

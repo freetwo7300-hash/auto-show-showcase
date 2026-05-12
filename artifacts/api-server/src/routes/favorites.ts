@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { db, favoritesTable } from "@workspace/db";
 import { eq, and } from "drizzle-orm";
-import { getUserIdFromReq } from "./auth";
+import { requireAuth, getClerkUserId, type AuthedRequest } from "./auth";
 
 const router = Router();
 
-router.get("/favorites", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.get("/favorites", requireAuth, async (req, res) => {
+  const userId = (req as AuthedRequest).userId;
   try {
     const rows = await db.select({ car_id: favoritesTable.car_id })
       .from(favoritesTable)
@@ -19,11 +18,11 @@ router.get("/favorites", async (req, res) => {
   }
 });
 
-router.post("/favorites/:carId", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.post("/favorites/:carId", requireAuth, async (req, res) => {
+  const carId = String(req.params.carId);
+  const userId = (req as AuthedRequest).userId;
   try {
-    await db.insert(favoritesTable).values({ user_id: userId, car_id: req.params.carId }).onConflictDoNothing();
+    await db.insert(favoritesTable).values({ user_id: userId, car_id: carId }).onConflictDoNothing();
     return res.status(201).send();
   } catch (err) {
     req.log.error(err);
@@ -31,12 +30,12 @@ router.post("/favorites/:carId", async (req, res) => {
   }
 });
 
-router.delete("/favorites/:carId", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.delete("/favorites/:carId", requireAuth, async (req, res) => {
+  const carId = String(req.params.carId);
+  const userId = (req as AuthedRequest).userId;
   try {
     await db.delete(favoritesTable)
-      .where(and(eq(favoritesTable.user_id, userId), eq(favoritesTable.car_id, req.params.carId)));
+      .where(and(eq(favoritesTable.user_id, userId), eq(favoritesTable.car_id, carId)));
     return res.status(204).send();
   } catch (err) {
     req.log.error(err);

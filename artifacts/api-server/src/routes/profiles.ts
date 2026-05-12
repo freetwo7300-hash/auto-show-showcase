@@ -1,13 +1,12 @@
 import { Router } from "express";
 import { db, profilesTable } from "@workspace/db";
 import { eq } from "drizzle-orm";
-import { getUserIdFromReq } from "./auth";
+import { requireAuth, getClerkUserId, type AuthedRequest } from "./auth";
 
 const router = Router();
 
-router.get("/profile", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.get("/profile", requireAuth, async (req, res) => {
+  const userId = (req as AuthedRequest).userId;
   try {
     const [profile] = await db.select().from(profilesTable).where(eq(profilesTable.user_id, userId)).limit(1);
     if (!profile) {
@@ -21,9 +20,8 @@ router.get("/profile", async (req, res) => {
   }
 });
 
-router.patch("/profile", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.patch("/profile", requireAuth, async (req, res) => {
+  const userId = (req as AuthedRequest).userId;
   try {
     const { display_name, phone } = req.body;
     const patch: Partial<typeof profilesTable.$inferInsert> = { updated_at: new Date() };

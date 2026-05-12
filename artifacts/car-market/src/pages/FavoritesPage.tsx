@@ -4,10 +4,12 @@ import { useAuth } from "@/hooks/useAuth";
 import { useCars, useFavorites } from "@/hooks/useCars";
 import { Heart } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
+import { useLocation } from "wouter";
+import type { Car } from "@/data/cars";
 
 export default function FavoritesPage() {
   const { user } = useAuth();
+  const [, navigate] = useLocation();
   const { data: cars = [] } = useCars();
   const { data: favIds = [] } = useFavorites(user?.id);
 
@@ -17,18 +19,21 @@ export default function FavoritesPage() {
         <div className="text-center py-20">
           <Heart className="w-12 h-12 mx-auto text-muted-foreground mb-4" />
           <p className="text-xl mb-4">سجّل الدخول لعرض المفضلة</p>
-          <Button asChild><Link to="/auth">تسجيل الدخول</Link></Button>
+          <Button onClick={() => navigate("/sign-in")}>تسجيل الدخول</Button>
         </div>
       </AppLayout>
     );
   }
 
-  const favCars = cars.filter((c) => favIds.includes(c.id)).map((c) => ({
+  const favCars: Car[] = cars.filter((c) => favIds.includes(c.id)).map((c) => ({
     id: c.id, brand: c.brand, model: c.model, year: c.year, price: Number(c.price),
-    mileage: c.mileage, condition: c.condition as any, color: c.color,
+    mileage: c.mileage,
+    condition: c.condition as "جديد" | "مستعمل",
+    color: c.color,
     fuelType: "بنزين", transmission: "أوتوماتيك", engine: "",
     bodyType: c.body_type, description: c.description || "",
-    images: c.images || [], features: c.features || [], status: c.status as any,
+    images: c.images || [], features: c.features || [],
+    status: c.status as "متاح" | "محجوز" | "مباع",
   }));
 
   return (

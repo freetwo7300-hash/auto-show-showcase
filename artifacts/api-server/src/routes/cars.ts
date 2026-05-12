@@ -1,15 +1,15 @@
 import { Router } from "express";
 import { db, carsTable } from "@workspace/db";
 import { eq, desc, and, gte, lte, SQL, count, avg } from "drizzle-orm";
-import { getUserIdFromReq } from "./auth";
+import { requireAuth, getClerkUserId, type AuthedRequest } from "./auth";
 
 const router = Router();
 
 router.get("/cars/stats", async (req, res) => {
   try {
     const [total] = await db.select({ count: count() }).from(carsTable);
-    const [forSale] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "for_sale"));
-    const [sold] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "sold"));
+    const [forSale] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "متاح"));
+    const [sold] = await db.select({ count: count() }).from(carsTable).where(eq(carsTable.status, "مباع"));
     const brands = await db.selectDistinct({ brand: carsTable.brand }).from(carsTable);
     const [avgPriceRow] = await db.select({ avg: avg(carsTable.price) }).from(carsTable);
     return res.json({
@@ -49,15 +49,14 @@ router.get("/cars", async (req, res) => {
   }
 });
 
-router.post("/cars", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.post("/cars", requireAuth, async (req, res) => {
+  const userId = (req as AuthedRequest).userId;
   try {
     const { brand, model, year, price, mileage, color, body_type, condition, status, description, features, images } = req.body;
     const [car] = await db.insert(carsTable).values({
       brand, model, year, price, mileage: mileage ?? 0, color, body_type,
-      condition: condition ?? "used",
-      status: status ?? "for_sale",
+      condition: condition ?? "مستعمل",
+      status: status ?? "متاح",
       description: description ?? null,
       features: features ?? null,
       images: images ?? null,
@@ -71,8 +70,9 @@ router.post("/cars", async (req, res) => {
 });
 
 router.get("/cars/:id", async (req, res) => {
+  const id = String(req.params.id);
   try {
-    const [car] = await db.select().from(carsTable).where(eq(carsTable.id, req.params.id)).limit(1);
+    const [car] = await db.select().from(carsTable).where(eq(carsTable.id, id)).limit(1);
     if (!car) return res.status(404).json({ error: "Car not found" });
     return res.json(car);
   } catch (err) {
@@ -81,11 +81,11 @@ router.get("/cars/:id", async (req, res) => {
   }
 });
 
-router.patch("/cars/:id", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.patch("/cars/:id", requireAuth, async (req, res) => {
+  const id = String(req.params.id);
+  const userId = (req as AuthedRequest).userId;
   try {
-    const [existing] = await db.select().from(carsTable).where(eq(carsTable.id, req.params.id)).limit(1);
+    const [existing] = await db.select().from(carsTable).where(eq(carsTable.id, id)).limit(1);
     if (!existing) return res.status(404).json({ error: "Car not found" });
     if (existing.added_by && existing.added_by !== userId) return res.status(403).json({ error: "Forbidden" });
 
@@ -105,7 +105,7 @@ router.patch("/cars/:id", async (req, res) => {
     if (images !== undefined) patch.images = images;
     patch.updated_at = new Date();
 
-    const [updated] = await db.update(carsTable).set(patch).where(eq(carsTable.id, req.params.id)).returning();
+    const [updated] = await db.update(carsTable).set(patch).where(eq(carsTable.id, id)).returning();
     return res.json(updated);
   } catch (err) {
     req.log.error(err);
@@ -113,14 +113,14 @@ router.patch("/cars/:id", async (req, res) => {
   }
 });
 
-router.delete("/cars/:id", async (req, res) => {
-  const userId = getUserIdFromReq(req);
-  if (!userId) return res.status(401).json({ error: "Unauthorized" });
+router.delete("/cars/:id", requireAuth, async (req, res) => {
+  const id = String(req.params.id);
+  const userId = (req as AuthedRequest).userId;
   try {
-    const [existing] = await db.select().from(carsTable).where(eq(carsTable.id, req.params.id)).limit(1);
+    const [existing] = await db.select().from(carsTable).where(eq(carsTable.id, id)).limit(1);
     if (!existing) return res.status(404).json({ error: "Car not found" });
     if (existing.added_by && existing.added_by !== userId) return res.status(403).json({ error: "Forbidden" });
-    await db.delete(carsTable).where(eq(carsTable.id, req.params.id));
+    await db.delete(carsTable).where(eq(carsTable.id, id));
     return res.status(204).send();
   } catch (err) {
     req.log.error(err);

@@ -2,7 +2,7 @@ import { useState, useMemo } from "react";
 import { AppLayout } from "@/components/layout/AppLayout";
 import { CarCard } from "@/components/cars/CarCard";
 import { CarFilters, Filters } from "@/components/cars/CarFilters";
-import { useCars } from "@/hooks/useCars";
+import { useCars, type DbCar } from "@/hooks/useCars";
 import { carsData, Car } from "@/data/cars";
 import { LayoutGrid, List } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -22,7 +22,7 @@ const initialFilters: Filters = {
   priceTo: "",
 };
 
-const mapDbCar = (c: any): Car => ({
+const mapDbCar = (c: DbCar): Car => ({
   id: c.id,
   brand: c.brand,
   model: c.model,
@@ -31,9 +31,9 @@ const mapDbCar = (c: any): Car => ({
   mileage: c.mileage,
   condition: c.condition as "جديد" | "مستعمل",
   color: c.color,
-  fuelType: c.fuel_type || "بنزين",
-  transmission: c.transmission || "أوتوماتيك",
-  engine: c.engine || "",
+  fuelType: "بنزين",
+  transmission: "أوتوماتيك",
+  engine: "",
   bodyType: c.body_type,
   description: c.description || "",
   images: c.images || [],
