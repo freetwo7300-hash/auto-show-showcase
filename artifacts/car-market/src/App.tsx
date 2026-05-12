@@ -3,6 +3,7 @@ import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
 import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
+import { Car as CarIcon, CheckCircle } from "lucide-react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -89,19 +90,144 @@ const clerkAppearance = {
   },
 };
 
+const authFeatures = [
+  { text: "تصفح مئات السيارات الفاخرة بتصاميم أنيقة" },
+  { text: "قارن بين السيارات لاتخاذ أفضل قرار" },
+  { text: "احفظ مفضلاتك وتواصل مع المعرض مباشرة" },
+];
+
+function AuthLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <div
+      className="min-h-[100dvh] flex"
+      style={{ background: "hsl(0 0% 6%)" }}
+    >
+      {/* ── Left / branding panel (desktop only) ── */}
+      <div className="hidden lg:flex lg:w-[52%] relative flex-col items-center justify-center p-14 overflow-hidden select-none">
+        {/* radial glow */}
+        <div
+          className="absolute inset-0 pointer-events-none"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 70% at 30% 50%, hsl(0 85% 50% / 0.12) 0%, transparent 70%)",
+          }}
+        />
+        {/* bottom-left blob */}
+        <div
+          className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full pointer-events-none"
+          style={{ background: "hsl(0 85% 50% / 0.06)" }}
+        />
+        {/* top-right blob */}
+        <div
+          className="absolute -top-24 right-0 w-80 h-80 rounded-full pointer-events-none"
+          style={{ background: "hsl(0 85% 50% / 0.04)" }}
+        />
+
+        {/* Content */}
+        <div className="relative z-10 w-full max-w-md text-right">
+          {/* Logo mark */}
+          <div className="flex items-center gap-4 mb-12">
+            <div
+              className="w-14 h-14 rounded-2xl flex items-center justify-center shadow-lg shadow-red-900/40 shrink-0"
+              style={{ background: "hsl(0 85% 50%)" }}
+            >
+              <CarIcon className="w-7 h-7 text-white" />
+            </div>
+            <div>
+              <h1 className="font-display text-2xl font-bold text-white leading-tight">
+                المعرض
+              </h1>
+              <p className="text-sm" style={{ color: "hsl(0 0% 55%)" }}>
+                إدارة السيارات الفاخرة
+              </p>
+            </div>
+          </div>
+
+          {/* Headline */}
+          <h2
+            className="font-display text-4xl xl:text-5xl font-bold leading-tight mb-5"
+            style={{ color: "hsl(0 0% 94%)" }}
+          >
+            اكتشف سيارتك
+            <br />
+            <span style={{ color: "hsl(0 85% 55%)" }}>المثالية</span> بسهولة
+          </h2>
+          <p className="text-lg mb-10 leading-relaxed" style={{ color: "hsl(0 0% 50%)" }}>
+            منصة متكاملة لعرض وإدارة السيارات بواجهة عربية أنيقة
+          </p>
+
+          {/* Feature list */}
+          <ul className="space-y-4">
+            {authFeatures.map((f, i) => (
+              <li key={i} className="flex items-center gap-3">
+                <CheckCircle
+                  className="w-5 h-5 shrink-0"
+                  style={{ color: "hsl(0 85% 55%)" }}
+                />
+                <span className="text-sm" style={{ color: "hsl(0 0% 65%)" }}>
+                  {f.text}
+                </span>
+              </li>
+            ))}
+          </ul>
+
+          {/* Divider */}
+          <div
+            className="mt-14 pt-8 border-t flex items-center justify-between text-xs"
+            style={{
+              borderColor: "hsl(0 0% 18%)",
+              color: "hsl(0 0% 35%)",
+            }}
+          >
+            <span>© 2026 المعرض</span>
+            <span>جميع الحقوق محفوظة</span>
+          </div>
+        </div>
+      </div>
+
+      {/* ── Right / Clerk form panel ── */}
+      <div
+        className="flex-1 flex flex-col items-center justify-center p-4 py-12 relative"
+        style={{ borderRight: "1px solid hsl(0 0% 13%)" }}
+      >
+        {/* Subtle top glow for the form side */}
+        <div
+          className="absolute top-0 inset-x-0 h-px pointer-events-none"
+          style={{ background: "linear-gradient(90deg, transparent, hsl(0 85% 50% / 0.4), transparent)" }}
+        />
+
+        {/* Mobile logo — only visible when branding panel is hidden */}
+        <div className="lg:hidden flex items-center gap-3 mb-10">
+          <div
+            className="w-10 h-10 rounded-xl flex items-center justify-center shadow-md"
+            style={{ background: "hsl(0 85% 50%)" }}
+          >
+            <CarIcon className="w-5 h-5 text-white" />
+          </div>
+          <span className="font-display text-2xl font-bold text-white">المعرض</span>
+        </div>
+
+        <div className="w-full max-w-[440px]">
+          {children}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function SignInPage() {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
+    <AuthLayout>
       <SignIn routing="path" path={`${basePath}/sign-in`} signUpUrl={`${basePath}/sign-up`} />
-    </div>
+    </AuthLayout>
   );
 }
 
 function SignUpPage() {
   return (
-    <div className="flex min-h-[100dvh] items-center justify-center bg-background px-4">
+    <AuthLayout>
       <SignUp routing="path" path={`${basePath}/sign-up`} signInUrl={`${basePath}/sign-in`} />
-    </div>
+    </AuthLayout>
   );
 }
 
