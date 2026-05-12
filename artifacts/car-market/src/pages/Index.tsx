@@ -8,30 +8,23 @@ import { Car as CarIcon, DollarSign, TrendingUp, Package, Sparkles, PlusCircle }
 import { Link } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
+import { useI18n } from "@/i18n";
 import hero from "@/assets/hero-showroom.jpg";
 
 function mapDbCar(c: DbCar): Car {
   return {
-    id: c.id,
-    brand: c.brand,
-    model: c.model,
-    year: c.year,
-    price: Number(c.price),
-    mileage: c.mileage,
+    id: c.id, brand: c.brand, model: c.model, year: c.year,
+    price: Number(c.price), mileage: c.mileage,
     condition: c.condition as "جديد" | "مستعمل",
-    color: c.color,
-    fuelType: "بنزين",
-    transmission: "أوتوماتيك",
-    engine: "",
-    bodyType: c.body_type,
-    description: c.description || "",
-    images: c.images || [],
-    features: c.features || [],
+    color: c.color, fuelType: "بنزين", transmission: "أوتوماتيك", engine: "",
+    bodyType: c.body_type, description: c.description || "",
+    images: c.images || [], features: c.features || [],
     status: c.status as "متاح" | "محجوز" | "مباع",
   };
 }
 
 const Dashboard = () => {
+  const { t } = useI18n();
   const { data: dbCars, isLoading } = useCars();
   const hasDbData = dbCars && dbCars.length > 0;
 
@@ -45,41 +38,44 @@ const Dashboard = () => {
   return (
     <AppLayout>
       <div className="space-y-8">
-        {/* Hero */}
         <div className="relative rounded-3xl overflow-hidden border">
           <img src={hero} alt="معرض سيارات فاخر" width={1920} height={896}
             className="w-full h-56 md:h-72 object-cover" />
           <div className="absolute inset-0 bg-gradient-to-l from-background/95 via-background/60 to-transparent" />
           <div className="absolute inset-0 flex flex-col justify-center p-6 md:p-12 max-w-2xl">
             <div className="inline-flex items-center gap-2 text-xs font-medium text-primary mb-3">
-              <Sparkles className="w-4 h-4" /> أهلاً بك في معرضك
+              <Sparkles className="w-4 h-4" /> {t.dashboard.welcome}
             </div>
             <h1 className="text-3xl md:text-5xl font-display font-bold mb-3">
-              إدارة معرض السيارات بأناقة
+              {t.dashboard.title}
             </h1>
             <p className="text-muted-foreground mb-5 max-w-md">
-              تابع المخزون، أضف سيارات جديدة، وحلّل أداء المعرض في لوحة واحدة.
+              {t.dashboard.subtitle}
             </p>
             <div className="flex gap-3">
-              <Button asChild size="lg"><Link href="/cars/new"><PlusCircle className="w-4 h-4 ml-1" /> إضافة سيارة</Link></Button>
-              <Button asChild size="lg" variant="outline"><Link href="/cars">تصفّح السيارات</Link></Button>
+              <Button asChild size="lg">
+                <Link href="/cars/new"><PlusCircle className="w-4 h-4 ml-1" /> {t.dashboard.addCar}</Link>
+              </Button>
+              <Button asChild size="lg" variant="outline">
+                <Link href="/cars">{t.dashboard.browseCars}</Link>
+              </Button>
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          <StatCard title="إجمالي السيارات" value={totalCars} icon={CarIcon} trend={`${available} متاحة`} delay={0} />
-          <StatCard title="سيارات جديدة" value={newCars} icon={Package} trend="زيرو كيلومتر" delay={100} />
-          <StatCard title="إجمالي القيمة" value={`${(totalValue / 1000000).toFixed(1)}M`} icon={DollarSign} trend="ريال سعودي" delay={200} />
-          <StatCard title="متوسط السعر" value={totalCars > 0 ? `${Math.round(totalValue / totalCars / 1000)}K` : "0"} icon={TrendingUp} trend="ريال" delay={300} />
+          <StatCard title={t.dashboard.totalCars} value={totalCars} icon={CarIcon} trend={`${available} ${t.dashboard.available}`} delay={0} />
+          <StatCard title={t.dashboard.newCars} value={newCars} icon={Package} trend={t.dashboard.zeroKm} delay={100} />
+          <StatCard title={t.dashboard.totalValue} value={`${(totalValue / 1000000).toFixed(1)}M`} icon={DollarSign} trend={t.common.sar} delay={200} />
+          <StatCard title={t.dashboard.avgPrice} value={totalCars > 0 ? `${Math.round(totalValue / totalCars / 1000)}K` : "0"} icon={TrendingUp} trend={t.car.sar} delay={300} />
         </div>
 
         <DashboardCharts cars={cars} />
 
         <div>
           <div className="flex items-center justify-between mb-4">
-            <h2 className="text-xl font-display font-bold">أحدث السيارات</h2>
-            <Button variant="ghost" asChild><Link href="/cars">عرض الكل</Link></Button>
+            <h2 className="text-xl font-display font-bold">{t.dashboard.latestCars}</h2>
+            <Button variant="ghost" asChild><Link href="/cars">{t.dashboard.viewAll}</Link></Button>
           </div>
           {isLoading ? (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">

@@ -78,6 +78,9 @@
   "dependencies": {
     "@clerk/react": "^6.6.2",
     "@clerk/themes": "^2.4.57",
+    "@tanstack/react-table": "^8.21.3",
+    "i18next": "^26.1.0",
+    "react-i18next": "^17.0.7",
     "react-router-dom": "^7.15.0",
     "vitest": "^4.1.6"
   }

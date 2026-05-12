@@ -18,12 +18,15 @@ export function useAuth() {
       }
     : null;
 
+  const isAdmin = (user?.publicMetadata as Record<string, unknown>)?.role === "admin";
+
   const signOut = async () => {
     await clerkSignOut();
   };
 
   return {
     user: authUser,
+    isAdmin,
     loading: !isLoaded,
     signOut,
   };

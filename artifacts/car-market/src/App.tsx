@@ -7,12 +7,14 @@ import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/reac
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { ThemeProvider } from "@/hooks/useTheme";
+import { I18nProvider } from "@/i18n";
+import { CompareProvider } from "@/hooks/useCompare";
 import Index from "./pages/Index";
 import CarsPage from "./pages/CarsPage";
 import CarDetailPage from "./pages/CarDetailPage";
 import AddCarPage from "./pages/AddCarPage";
 import EditCarPage from "./pages/EditCarPage";
-import FavoritesPage from "./pages/FavoritesPage";
+import ComparePage from "./pages/ComparePage";
 import ProfilePage from "./pages/ProfilePage";
 import SettingsPage from "./pages/SettingsPage";
 import NotFound from "./pages/NotFound";
@@ -130,7 +132,7 @@ function AppRoutes() {
       <Route path="/cars/new" component={AddCarPage} />
       <Route path="/cars/:id/edit" component={EditCarPage} />
       <Route path="/cars/:id" component={CarDetailPage} />
-      <Route path="/favorites" component={FavoritesPage} />
+      <Route path="/compare" component={ComparePage} />
       <Route path="/profile" component={ProfilePage} />
       <Route path="/settings" component={SettingsPage} />
       <Route path="/sign-in/*?" component={SignInPage} />
@@ -170,10 +172,14 @@ function ClerkProviderWithRoutes() {
       <QueryClientProvider client={queryClient}>
         <ClerkQueryClientCacheInvalidator />
         <ThemeProvider>
-          <TooltipProvider>
-            <Sonner />
-            <AppRoutes />
-          </TooltipProvider>
+          <I18nProvider>
+            <CompareProvider>
+              <TooltipProvider>
+                <Sonner />
+                <AppRoutes />
+              </TooltipProvider>
+            </CompareProvider>
+          </I18nProvider>
         </ThemeProvider>
       </QueryClientProvider>
     </ClerkProvider>
