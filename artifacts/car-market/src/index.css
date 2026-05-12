@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;500;600;700;800;900&family=Tajawal:wght@300;400;500;700;800;900&display=swap');
+/* Fonts loaded via <link> in index.html for better LCP performance */
 
 @tailwind base;
 @tailwind components;
@@ -101,18 +101,76 @@
 @layer base {
   * {
     @apply border-border;
+    /* Firefox scrollbar */
+    scrollbar-width: thin;
+    scrollbar-color: hsl(var(--muted-foreground) / 0.2) transparent;
+  }
+
+  /* Webkit scrollbar — thin, themed, RTL-safe */
+  ::-webkit-scrollbar {
+    width: 5px;
+    height: 5px;
+  }
+  ::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--muted-foreground) / 0.2);
+    border-radius: 9999px;
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--muted-foreground) / 0.4);
+  }
+  ::-webkit-scrollbar-corner {
+    background: transparent;
   }
 
   html {
     direction: rtl;
+    /* Smooth scroll globally */
+    scroll-behavior: smooth;
+    /* Prevent text size inflation on mobile */
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
   }
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    /* Prevent horizontal overflow on mobile */
+    overflow-x: hidden;
+    /* Safe area for notched phones */
+    padding-bottom: env(safe-area-inset-bottom, 0);
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display font-bold;
+  }
+
+  /* Better tap target sizes on mobile */
+  button, a, [role="button"] {
+    touch-action: manipulation;
+  }
+
+  /* Selection colour matching brand */
+  ::selection {
+    background: hsl(var(--primary) / 0.2);
+    color: hsl(var(--primary));
+  }
+
+  /* Focus visible - keyboard-only, not click */
+  :focus-visible {
+    @apply outline-none ring-2 ring-ring ring-offset-2 ring-offset-background;
+  }
+
+  /* Remove focus ring on click */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Smooth image loading */
+  img {
+    @apply max-w-full;
+    image-rendering: auto;
   }
 }
 
@@ -127,5 +185,64 @@
 
   .card-hover {
     @apply transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+  }
+
+  /* RTL-safe padding for safe area (notched phones) */
+  .pb-safe {
+    padding-bottom: max(env(safe-area-inset-bottom, 0px), 1rem);
+  }
+
+  /* Fade-in animation */
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease forwards;
+  }
+
+  /* Slide up */
+  .animate-slide-up {
+    animation: slideUp 0.35s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+  }
+
+  /* Hide scrollbar visually but keep scroll functionality */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ── PWA standalone mode adjustments ── */
+@media (display-mode: standalone) {
+  body {
+    padding-top: env(safe-area-inset-top, 0);
+  }
+}
+
+/* ── Responsive typography scale ── */
+@media (max-width: 640px) {
+  .font-display {
+    letter-spacing: -0.01em;
+  }
+}
+
+/* ── Print styles ── */
+@media print {
+  .glass, nav, aside, header {
+    display: none !important;
+  }
+  body {
+    background: white;
+    color: black;
   }
 }

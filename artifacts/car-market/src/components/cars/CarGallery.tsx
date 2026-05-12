@@ -1,6 +1,6 @@
 import { useState, useCallback, useEffect } from "react";
 import useEmblaCarousel from "embla-carousel-react";
-import { Dialog, DialogContent } from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogTitle } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ZoomIn, X } from "lucide-react";
@@ -142,6 +142,7 @@ export function CarGallery({ images, alt, status, statusClass }: CarGalleryProps
 
       <Dialog open={zoomOpen} onOpenChange={setZoomOpen}>
         <DialogContent className="max-w-5xl p-0 bg-black/95 border-0 overflow-hidden">
+          <DialogTitle className="sr-only">{alt} — عرض الصورة</DialogTitle>
           <button
             onClick={() => setZoomOpen(false)}
             className="absolute top-3 right-3 z-10 w-8 h-8 rounded-full bg-white/10 flex items-center justify-center hover:bg-white/20 text-white"
