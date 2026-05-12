@@ -2,6 +2,7 @@ import { useEffect, useRef } from "react";
 import { ClerkProvider, SignIn, SignUp, useClerk } from "@clerk/react";
 import { publishableKeyFromHost } from "@clerk/react/internal";
 import { shadcn } from "@clerk/themes";
+import { arSA } from "@clerk/localizations";
 import { Switch, Route, useLocation, Router as WouterRouter } from "wouter";
 import { Car as CarIcon, CheckCircle } from "lucide-react";
 import { QueryClient, QueryClientProvider, useQueryClient } from "@tanstack/react-query";
@@ -43,6 +44,12 @@ if (!clerkPubKey) {
   throw new Error("Missing VITE_CLERK_PUBLISHABLE_KEY");
 }
 
+/* Page background: hsl(0 0% 6%) ≈ #0f0f0f — all Clerk colours must match this palette */
+const PAGE_BG   = "#0f0f0f";   /* matches AuthLayout background                   */
+const CARD_BG   = "#161616";   /* slightly lighter so card is subtly distinguished */
+const INPUT_BG  = "#1f1f1f";   /* clearly lighter for input contrast               */
+const BORDER    = "rgba(255,255,255,0.07)";
+
 const clerkAppearance = {
   theme: shadcn,
   cssLayerName: "clerk",
@@ -52,43 +59,43 @@ const clerkAppearance = {
     logoImageUrl: `${window.location.origin}${basePath}/logo.svg`,
   },
   variables: {
-    colorPrimary: "#e11d48",
-    colorForeground: "#f8fafc",
-    colorMutedForeground: "#94a3b8",
-    colorDanger: "#ef4444",
-    colorBackground: "#1e1e2e",
-    colorInput: "#2d2d3f",
-    colorInputForeground: "#f8fafc",
-    colorNeutral: "#334155",
-    fontFamily: "Cairo, Tajawal, sans-serif",
-    borderRadius: "0.75rem",
+    colorPrimary:           "#e11d48",
+    colorForeground:        "#f0f0f0",
+    colorMutedForeground:   "#888888",
+    colorDanger:            "#ef4444",
+    colorBackground:        CARD_BG,
+    colorInput:             INPUT_BG,
+    colorInputForeground:   "#f0f0f0",
+    colorNeutral:           "#555555",
+    fontFamily:             "Cairo, Tajawal, sans-serif",
+    borderRadius:           "0.625rem",
   },
   elements: {
-    rootBox: "w-full flex justify-center",
-    cardBox: "bg-[#1e1e2e] rounded-2xl w-[440px] max-w-full overflow-hidden border border-white/10",
-    card: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    footer: "!shadow-none !border-0 !bg-transparent !rounded-none",
-    headerTitle: "text-white font-bold",
-    headerSubtitle: "text-slate-400",
-    socialButtonsBlockButtonText: "text-white",
-    formFieldLabel: "text-slate-300",
-    footerActionLink: "text-rose-400 hover:text-rose-300",
-    footerActionText: "text-slate-400",
-    dividerText: "text-slate-500",
-    identityPreviewEditButton: "text-rose-400",
-    formFieldSuccessText: "text-emerald-400",
-    alertText: "text-white",
-    logoBox: "flex justify-center",
-    logoImage: "h-10 w-auto",
-    socialButtonsBlockButton: "border-white/10 hover:bg-white/5",
-    formButtonPrimary: "bg-rose-600 hover:bg-rose-700 text-white",
-    formFieldInput: "bg-[#2d2d3f] border-white/10 text-white",
-    footerAction: "bg-transparent",
-    dividerLine: "bg-white/10",
-    alert: "bg-red-900/30 border-red-500/30",
-    otpCodeFieldInput: "bg-[#2d2d3f] border-white/10 text-white",
-    formFieldRow: "gap-3",
-    main: "gap-4",
+    rootBox:                        "w-full flex justify-center",
+    cardBox:                        `w-[440px] max-w-full overflow-hidden rounded-2xl border`,
+    card:                           "!shadow-none !border-0 !bg-transparent !rounded-none",
+    footer:                         "!shadow-none !border-0 !bg-transparent !rounded-none",
+    headerTitle:                    "text-white font-bold",
+    headerSubtitle:                 "text-white/50",
+    socialButtonsBlockButtonText:   "text-white/90",
+    socialButtonsBlockButton:       `border hover:bg-white/5`,
+    formFieldLabel:                 "text-white/70 text-sm",
+    formFieldInput:                 `border text-white placeholder:text-white/30`,
+    formButtonPrimary:              "bg-rose-600 hover:bg-rose-500 text-white transition-colors",
+    footerActionLink:               "text-rose-400 hover:text-rose-300",
+    footerActionText:               "text-white/40",
+    footerAction:                   "bg-transparent",
+    dividerText:                    "text-white/30",
+    dividerLine:                    `bg-white/8`,
+    identityPreviewEditButton:      "text-rose-400",
+    formFieldSuccessText:           "text-emerald-400",
+    alertText:                      "text-white",
+    alert:                          "bg-red-900/20 border-red-500/20",
+    otpCodeFieldInput:              `border text-white`,
+    logoBox:                        "flex justify-center",
+    logoImage:                      "h-10 w-auto",
+    formFieldRow:                   "gap-3",
+    main:                           "gap-4",
   },
 };
 
@@ -257,8 +264,15 @@ function ClerkProviderWithRoutes() {
       signInUrl={`${basePath}/sign-in`}
       signUpUrl={`${basePath}/sign-up`}
       localization={{
-        signIn:  { start: { title: "أهلاً بعودتك",      subtitle: "سجّل دخولك للمتابعة"     } },
-        signUp:  { start: { title: "إنشاء حساب جديد",   subtitle: "سجّل في معرض السيارات"   } },
+        ...arSA,
+        signIn: {
+          ...arSA.signIn,
+          start: { ...arSA.signIn?.start, title: "أهلاً بعودتك", subtitle: "سجّل دخولك للمتابعة" },
+        },
+        signUp: {
+          ...arSA.signUp,
+          start: { ...arSA.signUp?.start, title: "إنشاء حساب جديد", subtitle: "سجّل في معرض السيارات" },
+        },
       }}
       routerPush={(to) => setLocation(stripBase(to))}
       routerReplace={(to) => setLocation(stripBase(to), { replace: true })}

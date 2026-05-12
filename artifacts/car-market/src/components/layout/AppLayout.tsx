@@ -56,7 +56,20 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
   }: {
     href: string; label: string; icon: React.ElementType; badge?: number; extraBadge?: React.ReactNode;
   }) {
-    const isActive = location === href || (href !== "/" && location.startsWith(href));
+    const isActive = (() => {
+      if (href === "/") return location === "/";
+      // /cars: active for /cars exactly or /cars/:id detail — NOT /cars/new or /cars/:id/edit
+      if (href === "/cars") {
+        return (
+          location === "/cars" ||
+          (location.startsWith("/cars/") &&
+            location !== "/cars/new" &&
+            !location.endsWith("/edit"))
+        );
+      }
+      // All other nav items: exact match only
+      return location === href;
+    })();
     return (
       <Link
         href={href}
